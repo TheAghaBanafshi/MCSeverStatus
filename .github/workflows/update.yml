@@ -1,0 +1,81 @@
+name: Ping Minecraft Servers
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'server.txt'
+      - 'ping.py'
+      - 'index.html'
+      - '.github/workflows/ping-servers.yml'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip cache purge
+          pip install --upgrade --no-cache-dir "mcstatus>=11.1.0"
+
+      - name: Run ping script
+        run: python ping.py
+
+      - name: Show ping.txt
+        run: cat ping.txt
+
+      - name: Commit and push results
+        run: |
+          git config user.name "Minecraft Servers"
+          git config user.email "yeknafarrrrr12@users.noreply.github.com"
+          git add ping.txt
+          git diff --cached --quiet && echo "No changes" || git commit -m "🤖 Update ping.txt [skip ci]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: ping
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Pull latest (with updated ping.txt)
+        run: git pull origin main
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
