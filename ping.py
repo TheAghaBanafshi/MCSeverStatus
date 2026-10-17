@@ -8,11 +8,9 @@ INPUT_FILE = "server.txt"
 OUTPUT_FILE = "ping.txt"
 TIMEOUT = 5
 
-# هدر User-Agent برای API واسط (شبیه مرورگر کروم)
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 def extract_motd(motd):
-    """استخراج MOTD از پاسخ mcstatus"""
     if isinstance(motd, dict):
         text = motd.get("text", "")
         for e in motd.get("extra", []):
@@ -24,7 +22,6 @@ def extract_motd(motd):
     return str(motd)
 
 def ping_with_mcstatus(addr):
-    """تلاش اول: پینگ مستقیم با mcstatus"""
     try:
         server = JavaServer.lookup(addr, timeout=TIMEOUT)
         status = server.status()
@@ -32,7 +29,6 @@ def ping_with_mcstatus(addr):
         maxp = status.players.max
         motd = extract_motd(status.description).replace("\n", " ").replace('"', "'")
 
-        # آیکون سرور
         icon = ""
         if hasattr(status, "icon") and status.icon:
             icon = status.icon
@@ -52,11 +48,10 @@ def ping_with_mcstatus(addr):
         return {"success": False}
 
 def ping_with_api(addr):
-    """تلاش دوم: استفاده از API واسط mcsrvstat.us با User-Agent"""
     try:
         url = f"https://api.mcsrvstat.us/3/{addr}"
         req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-        
+
         with urllib.request.urlopen(req, timeout=10) as response:
             data = json.loads(response.read().decode("utf-8"))
 
@@ -65,18 +60,15 @@ def ping_with_api(addr):
 
         online = data.get("players", {}).get("online", 0)
         maxp = data.get("players", {}).get("max", 0)
-        
-        # MOTD از API
+
         motd_data = data.get("motd", {})
         motd = ""
         if isinstance(motd_data, dict):
             motd = motd_data.get("clean", "") or motd_data.get("raw", "")
         elif isinstance(motd_data, list):
             motd = " ".join(motd_data)
-        
-        motd = motd.replace("\n", " ").replace('"', "'")
 
-        # آیکون
+        motd = motd.replace("\n", " ").replace('"', "'")
         icon = data.get("icon", "")
 
         return {
@@ -102,21 +94,20 @@ def main():
     results = []
     for addr in servers:
         print(f"\n--- Processing {addr} ---")
-        
-        # تلاش اول: mcstatus
+
         result = ping_with_mcstatus(addr)
-        
-        # اگه mcstatus جواب نداد، برو سراغ API
+
         if not result["success"]:
             print(f"[Fallback] Trying API for {addr}...")
             result = ping_with_api(addr)
-        
+
         if result["success"]:
             line = f'{addr} - Online - {result["online"]}/{result["max"]} players - "{result["motd"]}"'
             if result["icon"]:
                 line += f' | {result["icon"]}'
             results.append(line)
-            print(f"[OK] {addr} -> {result["online"]}/{result["max"]} (via {result["method"]}, icon: {'yes' if result["icon"] else 'no'})")
+            icon_status = 'yes' if result["icon"] else 'no'
+            print(f"[OK] {addr} -> {result['online']}/{result['max']} (via {result['method']}, icon: {icon_status})")
         else:
             results.append(f"{addr} - Offline")
             print(f"[FAIL] {addr} -> Offline")
