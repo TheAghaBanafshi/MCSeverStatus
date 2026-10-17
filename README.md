@@ -18,7 +18,7 @@
     <img src="https://img.shields.io/github/stars/TheAghaBanafshi?label=Stars&style=for-the-badge&color=a855f7&logo=github" />
   </a>
   <a href="https://github.com/TheAghaBanafshi">
-    <img src="https://komarev.com/ghpvc/?username=TheAghaBanafshi&label=Profile%20Views&color=a855f7&style=for-the-badge" />
+    <img src="komarev.com/ghpvc/?username=TheAghaBanafshi&label=Profile%20Views&color=a855f7&style=for-the-badge" />
   </a>
 </p>
 
