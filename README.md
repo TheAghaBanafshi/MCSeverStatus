@@ -15,7 +15,7 @@
 یه ابزار سبک و سریع برای نمایش وضعیت سرورهای ماینکرفت (آنلاین/آفلاین، تعداد پلیرها، و توضیحات سرور).
 
 <a href="https://github.com/TheAghaBanafshi/MCSeverStatus">
-  <img src="https://img.shields.io/badge/مشاهده%20پروژه-MCSeverStatus-brightgreen?style=for-the-badge&logo=github" alt="MCSeverStatus" />
+  <img src="https://img.shields.io/badge/View This Project-MCSeverStatus-brightgreen?style=for-the-badge&logo=github" alt="MCSeverStatus" />
 </a>
 
 ---
