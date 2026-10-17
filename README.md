@@ -2,9 +2,7 @@
 
 # سلام، من آقا بنفشی هستم! 👋
 
-<div align="center">
-  <img src="https://avatars.githubusercontent.com/u/310891506" width="150" style="border-radius: 50%;" alt="TheAghaBanafshi" />
-</div>
+<img src="https://avatars.githubusercontent.com/u/310891506" width="150" style="border-radius: 50%; border: 3px solid #a855f7;" alt="TheAghaBanafshi" />
 
 <br />
 
