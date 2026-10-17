@@ -3,45 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>وضعیت سرورهای ماینکرفت</title>
+    <title>MCSeverStatus | وضعیت سرورهای ماینکرفت</title>
     <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
             font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
-            background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 100%);
+            background: linear-gradient(135deg, #1e1e2e 0%, #2d1b3d 50%, #1e1e2e 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             color: #fff;
             min-height: 100vh;
-            padding: 20px;
+            overflow-x: hidden;
         }
-        .container { max-width: 1200px; margin: 0 auto; }
-        h1 {
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .particles {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: rgba(168,85,247,0.6);
+            border-radius: 50%;
+            animation: float 20s infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            50% { transform: translateY(-100vh) translateX(50px); opacity: 1; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
             text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.5em;
+            margin-bottom: 50px;
+            animation: fadeInDown 1s ease;
+        }
+        .header h1 {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #a855f7, #ec4899, #a855f7);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes shine {
+            to { background-position: 200% center; }
+        }
+        .header p {
+            color: #888;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .header-badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .header-badges img { height: 32px; }
+
+        .overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+            animation: fadeInUp 1s ease;
+        }
+        .overview-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(168,85,247,0.3);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .overview-card:hover {
+            border-color: #a855f7;
+            box-shadow: 0 10px 30px rgba(168,85,247,0.2);
+            transform: translateY(-3px);
+        }
+        .overview-icon { font-size: 2.5em; margin-bottom: 10px; }
+        .overview-number {
+            font-size: 2.2em;
+            font-weight: bold;
             background: linear-gradient(90deg, #a855f7, #ec4899);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
         }
-        .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
-        .last-update { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 30px; }
-        .grid {
+        .overview-label { color: #888; font-size: 0.95em; }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+            animation: fadeInUp 1s ease;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 14px 20px 14px 50px;
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(168,85,247,0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1em;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .search-box input:focus {
+            border-color: #a855f7;
+            box-shadow: 0 0 20px rgba(168,85,247,0.3);
+        }
+        .search-box input::placeholder { color: #666; }
+        .search-box .search-icon {
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2em;
+            pointer-events: none;
+        }
+
+        .refresh-btn {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #a855f7, #ec4899);
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-family: 'Vazirmatn', sans-serif;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(168,85,247,0.4);
+        }
+        .refresh-btn.spinning .refresh-icon {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .servers-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 20px;
+            animation: fadeInUp 1s ease;
         }
+
         .card {
             background: rgba(255,255,255,0.05);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 20px;
             border: 1px solid rgba(255,255,255,0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(168,85,247,0.2); }
-        .card.online { border-left: 4px solid #22c55e; }
-        .card.offline { border-left: 4px solid #ef4444; opacity: 0.7; }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            transition: all 0.3s;
+        }
+        .card.online::before { background: #22c55e; }
+        .card.offline::before { background: #ef4444; }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(168,85,247,0.2);
+            border-color: rgba(168,85,247,0.5);
+        }
+        .card.offline { opacity: 0.75; }
 
-        /* هدر کارت: آیکون + اسم سرور */
         .server-header {
             display: flex;
             align-items: center;
@@ -68,13 +237,22 @@
             justify-content: center;
             font-size: 1.5em;
         }
+        .server-info { flex: 1; min-width: 0; }
         .server-name {
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
             word-break: break-all;
             color: #a855f7;
             direction: ltr;
             text-align: right;
+            margin-bottom: 5px;
+        }
+        .server-ip {
+            font-size: 0.85em;
+            color: #666;
+            direction: ltr;
+            text-align: right;
+            font-family: 'Consolas', monospace;
         }
 
         .status {
@@ -88,7 +266,7 @@
         .status.online { background: rgba(34,197,94,0.2); color: #22c55e; }
         .status.offline { background: rgba(239,68,68,0.2); color: #ef4444; }
 
-        .players { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-size: 1.1em; }
+        .players { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 1.1em; }
         .players .icon { font-size: 1.3em; }
         .players .count { color: #fbbf24; font-weight: bold; }
         .players .max { color: #888; }
@@ -97,7 +275,7 @@
             background: rgba(0,0,0,0.4);
             padding: 12px;
             border-radius: 8px;
-            font-size: 0.95em;
+            font-size: 0.9em;
             word-wrap: break-word;
             white-space: pre-wrap;
             font-family: 'Consolas', 'Minecraft', monospace;
@@ -121,23 +299,144 @@
             transition: width 0.5s ease;
         }
 
-        .empty, .error { text-align: center; padding: 60px 20px; color: #666; }
+        .empty, .error {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+            grid-column: 1 / -1;
+        }
         .error { color: #ef4444; }
-        footer { text-align: center; margin-top: 50px; color: #555; font-size: 0.9em; }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            color: #555;
+            font-size: 0.9em;
+        }
+        .footer .heart {
+            color: #ec4899;
+            animation: heartbeat 1.5s ease infinite;
+            display: inline-block;
+        }
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        .footer a { color: #a855f7; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+
+        .last-update {
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #1e1e2e; }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #a855f7, #ec4899);
+            border-radius: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 2em; }
+            .servers-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
+    <div class="particles" id="particles"></div>
+
     <div class="container">
-        <h1>🎮 وضعیت سرورهای ماینکرفت</h1>
-        <p class="subtitle">لیست سرورها و وضعیت آنلاین بودنشون</p>
-        <p class="last-update" id="lastUpdate">در حال بارگذاری...</p>
-        <div class="grid" id="serversGrid">
+        <header class="header">
+            <h1>🎮 MCSeverStatus</h1>
+            <p>وضعیت زنده سرورهای ماینکرفت</p>
+            <div class="header-badges">
+                <a href="https://github.com/TheAghaBanafshi/MCSeverStatus">
+                    <img src="https://img.shields.io/badge/GitHub-MCSeverStatus-181717?style=for-the-badge&logo=github" alt="GitHub" />
+                </a>
+                <a href="https://github.com/TheAghaBanafshi/MCSeverStatus/stargazers">
+                    <img src="https://img.shields.io/github/stars/TheAghaBanafshi/MCSeverStatus?style=for-the-badge&color=a855f7&logo=github" alt="Stars" />
+                </a>
+                <a href="credits/">
+                    <img src="https://img.shields.io/badge/Credits-آقا%20بنفشی-a855f7?style=for-the-badge&logo=heart&logoColor=white" alt="Credits" />
+                </a>
+            </div>
+            <p class="last-update" id="lastUpdate">در حال بارگذاری...</p>
+        </header>
+
+        <div class="overview" id="overview">
+            <div class="overview-card">
+                <div class="overview-icon">🟢</div>
+                <div class="overview-number" id="onlineCount">0</div>
+                <div class="overview-label">سرور آنلاین</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon">🔴</div>
+                <div class="overview-number" id="offlineCount">0</div>
+                <div class="overview-label">سرور آفلاین</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon">👥</div>
+                <div class="overview-number" id="totalPlayers">0</div>
+                <div class="overview-label">کل پلیرها</div>
+            </div>
+            <div class="overview-card">
+                <div class="overview-icon">📊</div>
+                <div class="overview-number" id="totalServers">0</div>
+                <div class="overview-label">کل سرورها</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="جستجوی سرور..." />
+            </div>
+            <button class="refresh-btn" id="refreshBtn">
+                <span class="refresh-icon">🔄</span>
+                <span>به‌روزرسانی</span>
+            </button>
+        </div>
+
+        <div class="servers-grid" id="serversGrid">
             <div class="empty">در حال بارگذاری...</div>
         </div>
-        <footer>ساخته شده با ❤️ — آپدیت خودکار هر ۶ ساعت</footer>
+
+        <footer class="footer">
+            <p>ساخته شده با <span class="heart">❤️</span> توسط <a href="https://github.com/TheAghaBanafshi">آقا بنفشی</a></p>
+            <p style="margin-top: 10px; font-size: 0.85em;">
+                <a href="https://github.com/TheAghaBanafshi/MCSeverStatus">GitHub</a> • 
+                <a href="https://t.me/AghaBanafshi">Telegram</a> • 
+                <a href="credits/">Credits</a>
+            </p>
+        </footer>
     </div>
 
     <script>
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 100 + '%';
+            p.style.animationDelay = Math.random() * 20 + 's';
+            p.style.animationDuration = (15 + Math.random() * 10) + 's';
+            p.style.width = p.style.height = (2 + Math.random() * 3) + 'px';
+            particlesContainer.appendChild(p);
+        }
+
         const COLORS = {
             '0':'#000000','1':'#0000AA','2':'#00AA00','3':'#00AAAA',
             '4':'#AA0000','5':'#AA00AA','6':'#FFAA00','7':'#AAAAAA',
@@ -145,6 +444,8 @@
             'c':'#FF5555','d':'#FF55FF','e':'#FFFF55','f':'#FFFFFF'
         };
         const FORMATS = { 'l':'bold','o':'italic','n':'underline','m':'strike' };
+
+        let allServers = [];
 
         function escapeHtml(str) {
             const div = document.createElement('div');
@@ -192,7 +493,6 @@
             return html;
         }
 
-        // فرمت خط: IP - Online - X/Y players - "MOTD" | data:image/png;base64,...
         function parseLine(line) {
             const iconSplit = line.split(' | ');
             const mainPart = iconSplit[0];
@@ -221,7 +521,6 @@
             card.className = 'card ' + (s.online ? 'online' : 'offline');
             const percent = s.max > 0 ? (s.players / s.max * 100) : 0;
 
-            // لوگوی سرور: اگه favicon داشت، عکس؛ وگرنه placeholder
             const iconHtml = s.favicon
                 ? `<img class="server-icon" src="${s.favicon}" alt="server icon" onerror="this.outerHTML='<div class=\\'server-icon-placeholder\\'>🎮</div>'">`
                 : `<div class="server-icon-placeholder">🎮</div>`;
@@ -229,7 +528,10 @@
             card.innerHTML = `
                 <div class="server-header">
                     ${iconHtml}
-                    <div class="server-name">${escapeHtml(s.addr)}</div>
+                    <div class="server-info">
+                        <div class="server-name">${escapeHtml(s.addr)}</div>
+                        <div class="server-ip">${escapeHtml(s.addr)}</div>
+                    </div>
                 </div>
                 <span class="status ${s.online ? 'online' : 'offline'}">
                     ${s.online ? '● آنلاین' : '● آفلاین'}
@@ -249,9 +551,51 @@
             return card;
         }
 
+        function updateOverview(servers) {
+            const online = servers.filter(s => s.online).length;
+            const offline = servers.filter(s => !s.online).length;
+            const totalPlayers = servers.reduce((sum, s) => sum + (s.online ? s.players : 0), 0);
+
+            animateNumber('onlineCount', online);
+            animateNumber('offlineCount', offline);
+            animateNumber('totalPlayers', totalPlayers);
+            animateNumber('totalServers', servers.length);
+        }
+
+        function animateNumber(id, target) {
+            const el = document.getElementById(id);
+            const start = parseInt(el.textContent) || 0;
+            const duration = 1000;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(start + (target - start) * progress);
+                el.textContent = current;
+                if (progress < 1) requestAnimationFrame(update);
+                else el.textContent = target;
+            }
+            requestAnimationFrame(update);
+        }
+
+        function renderServers(servers) {
+            const grid = document.getElementById('serversGrid');
+            if (servers.length === 0) {
+                grid.innerHTML = '<div class="empty">هیچ سروری یافت نشد</div>';
+                return;
+            }
+            grid.innerHTML = '';
+            servers.forEach(line => grid.appendChild(createCard(parseLine(line))));
+        }
+
         async function loadServers() {
             const grid = document.getElementById('serversGrid');
             const lastUpdate = document.getElementById('lastUpdate');
+            const refreshBtn = document.getElementById('refreshBtn');
+
+            refreshBtn.classList.add('spinning');
+
             try {
                 const response = await fetch('ping.txt?t=' + Date.now());
                 if (!response.ok) throw new Error('ping.txt یافت نشد');
@@ -263,13 +607,24 @@
                     return;
                 }
 
-                grid.innerHTML = '';
-                lines.forEach(line => grid.appendChild(createCard(parseLine(line))));
+                allServers = lines;
+                renderServers(lines);
+                updateOverview(lines.map(parseLine));
                 lastUpdate.textContent = 'آخرین آپدیت: ' + new Date().toLocaleString('fa-IR');
             } catch (err) {
                 grid.innerHTML = `<div class="error">خطا در بارگذاری: ${err.message}</div>`;
+            } finally {
+                setTimeout(() => refreshBtn.classList.remove('spinning'), 500);
             }
         }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            const filtered = allServers.filter(line => line.toLowerCase().includes(query));
+            renderServers(filtered);
+        });
+
+        document.getElementById('refreshBtn').addEventListener('click', loadServers);
 
         loadServers();
         setInterval(loadServers, 5 * 60 * 1000);
