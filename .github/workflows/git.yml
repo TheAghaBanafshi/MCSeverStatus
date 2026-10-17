@@ -1,0 +1,65 @@
+name: Sync panel to My Project
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout my repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clone source repo
+        run: |
+          set -e
+          SRC_DIR="/tmp/panel-src"
+          rm -rf "$SRC_DIR"
+          git clone --depth 1 https://github.com/parsabanafshi1/panel.git "$SRC_DIR"
+
+      - name: Copy files (excluding .git, .github, .md)
+        run: |
+          set -e
+
+          # حذف .git مخزن مبدأ (حیاتی برای push)
+          rm -rf /tmp/panel-src/.git
+
+          # حذف .github مخزن مبدأ (اگر وجود داشت)
+          rm -rf /tmp/panel-src/.github
+
+          # حذف همه‌ی فایل‌های .md در هر مسیری
+          find /tmp/panel-src -type f -name '*.md' -delete
+
+          # پاک‌سازی محتوای پروژه به جز .git و .github
+          find . -mindepth 1 -maxdepth 1 \
+            ! -name '.git' \
+            ! -name '.github' \
+            -exec rm -rf {} +
+
+          # کپی همه‌ی محتوا
+          cp -r /tmp/panel-src/. .
+
+          # نمایش وضعیت
+          git status --short | head -30
+
+      - name: Configure git
+        run: |
+          git config user.name  "TheAghaBanafshi"
+          git config user.email "theaghabanafshi@users.noreply.github.com"
+
+      - name: Commit & Push
+        run: |
+          git add -A
+          if git diff --cached --quiet; then
+            echo "چیزی برای کامیت نیست."
+          else
+            git commit -m "Minecraft Server Status"
+            git push
+          fi
